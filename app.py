@@ -72,10 +72,10 @@ if st.session_state.authentication_success == True:
                 for item in innerDict:
                     for innerKey, values in item.items():
                         innerKey = column_change_dictionary[innerKey]
-                        if innerDict.index(item) == 0:
+                        try:
+                            reformed_dict[(outerKey, innerKey)].append(values)
+                        except KeyError as e:
                             reformed_dict[(outerKey, innerKey)] = [values]
-                            continue
-                        reformed_dict[(outerKey, innerKey)].append(values)
         return reformed_dict
     def ChangeButtonColour(widget_label, font_color, background_color='transparent'):
         htmlstr = f"""
@@ -334,4 +334,5 @@ if st.session_state.authentication_success == True:
 
         if datetime.now() - st.session_state.last_refresh_time >= timedelta(seconds=5):
             st.session_state.last_refresh_time = datetime.now()
+
         time.sleep(1) # Wait for 1 second before updating again
