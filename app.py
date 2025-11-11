@@ -198,23 +198,7 @@ if st.session_state.authentication_success == True:
     with reports:
         reports = st.empty()
     with harvest_predictions:
-        current_cycle = get_cycle()[-1]
-        current_sc = shrimp_data["shrimps_counted"][-1]
-        if current_cycle["end_date"] != "Currently Running":
-            st.write(f"There are no cycles currently running. No predictions will be presented")
-        else:
-            st.write(f"A Cycle has started last {current_cycle['start_date'].strftime('%A, %B %d, %Y')}. Currently Monitoring stated cycle.")
-            initial, current, nyield = st.columns(3)
-            with initial:
-                st.subheader("Initial Shrimp Count")
-                st.write(f"##### {current_cycle['isc']}")
-            with current:
-                st.subheader("Current Shrimp Count")
-                st.write(f"##### {current_sc}")
-            with nyield:
-                st.subheader("Harvest Rate")
-                st.write(f"##### {(current_sc/current_cycle['isc'])*100:.2f}%")
-        # harvest_predictions = st.empty()
+        harvest_predictions = st.empty()
     while True:
         current_time = datetime.now()
         formatted_time = current_time.strftime("Today is %A, %B %d, %Y | %I:%M:%S %p")
@@ -329,10 +313,27 @@ if st.session_state.authentication_success == True:
                     ths_second[i].decompose()
                 final_df = str(soup)
                 st.write(final_df, unsafe_allow_html=True)
-        # with harvest_predictions:
-        #     harvest_predictions.write("Harvest Predictions")
+        with harvest_predictions:
+            current_cycle = get_cycle()[-1]
+            current_sc = shrimp_data["shrimps_counted"][-1]
+            if current_cycle["end_date"] != "Currently Running":
+                harvest_predictions.write(f"There are no cycles currently running. No predictions will be presented")
+            else:
+                with harvest_predictions:
+                    st.write(f"A Cycle has started last {current_cycle['start_date'].strftime('%A, %B %d, %Y')}. Currently Monitoring stated cycle.")
+                    initial, current, nyield = st.columns(3)
+                    with initial:
+                        st.subheader("Initial Shrimp Count")
+                        st.write(f"##### {current_cycle['isc']}")
+                    with current:
+                        st.subheader("Current Shrimp Count")
+                        st.write(f"##### {current_sc}")
+                    with nyield:
+                        st.subheader("Harvest Rate")
+                        st.write(f"##### {(current_sc/current_cycle['isc'])*100:.2f}%")
 
         if datetime.now() - st.session_state.last_refresh_time >= timedelta(seconds=5):
             st.session_state.last_refresh_time = datetime.now()
 
         time.sleep(1) # Wait for 1 second before updating again
+
