@@ -25,7 +25,7 @@ column_change_dictionary = {
     "isc" : "Initial Shrimp Count",
     "fsc" : "Final Shrimp Count",
     "metrics" : "Metrics",
-    "EC" : "Electric Conductivity",
+    "EC" : "Salinity",
     "temperature" : "Temperature",
     "DO" : "Dissolved Oxygen",
     "pH" : "pH"
@@ -231,14 +231,14 @@ if st.session_state.authentication_success == True:
                     )
 
                 if 17.022 < latest_data["EC"][-1] < 53.065:
-                    EC.metric("Electric Conductivity",
+                    EC.metric("Salinity",
                             round(latest_data["EC"][-1], 2),
                             delta="Within Range",
                             chart_data=latest_data_df["EC"],
                             chart_type="area",
                             border=True)
                 else:
-                    EC.metric("Electric Conductivity", 
+                    EC.metric("Salinity", 
                             round(latest_data["EC"][-1], 2), 
                             delta="ALARMING: Outside safety range",
                             delta_color="inverse",
@@ -337,6 +337,7 @@ if st.session_state.authentication_success == True:
             st.session_state.last_refresh_time = datetime.now()
 
         time.sleep(1) # Wait for 1 second before updating again
+
 
 
 
