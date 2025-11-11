@@ -9,6 +9,7 @@ import time
 import streamlit.components.v1 as components
 from bs4 import BeautifulSoup
 import random
+import pytz
 
 
 from pymongo.mongo_client import MongoClient
@@ -200,7 +201,7 @@ if st.session_state.authentication_success == True:
     with harvest_predictions:
         harvest_predictions = st.empty()
     while True:
-        current_time = datetime.now()
+        current_time = datetime.now(tzinfo=pytz.timezone("PHT"))
         formatted_time = current_time.strftime("Today is %A, %B %d, %Y | %I:%M:%S %p")
         time_placeholder.markdown(f"{formatted_time}") # Update the content of the placeholder
         with monitoring:
@@ -336,4 +337,5 @@ if st.session_state.authentication_success == True:
             st.session_state.last_refresh_time = datetime.now()
 
         time.sleep(1) # Wait for 1 second before updating again
+
 
