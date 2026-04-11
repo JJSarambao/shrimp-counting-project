@@ -20,6 +20,17 @@ import pymongo
 st.set_page_config(layout="wide")
 
 
+class ManilaTZ(dt.tzinfo):
+    def utcoffset(self, when):
+        return dt.timedelta(hours=8)
+    def dst(self, when):
+        return dt.timedelta(0)
+    def tzname(self, when):
+        return "Manila/Philippines"
+    def __repr__(self):
+        return f"{self.__class__.__name__}()"
+
+
 column_change_dictionary = {
     "start_date" : "Start Date",
     "end_date" : "End Date",
@@ -37,7 +48,7 @@ if "authentication_success" not in st.session_state:
     st.session_state["authentication_success"] = False
 
 if "last_refresh_time" not in st.session_state:
-    st.session_state["last_refresh_time"] = datetime.now()
+    st.session_state["last_refresh_time"] = datetime.now(tz=ManilaTZ())
 
 @st.dialog("Authentication Required", dismissible=False)
 def login():
@@ -135,7 +146,7 @@ if st.session_state.authentication_success == True:
 
     @st.cache_data(ttl=dt.timedelta(seconds=10), show_spinner=False)
     def get_current_time():
-        current_time = datetime.now()
+        current_time = datetime.now(tz=ManilaTZ())
         formatted_time = current_time.strftime("Today is %A, %B %d, %Y | %I:%M:%S %p")
         return formatted_time
 
@@ -212,7 +223,7 @@ if st.session_state.authentication_success == True:
         client = MongoClient(uri, server_api=ServerApi('1'))
         db = client["sensors_db"]
         cycles = db["reports"]
-        new_data = {"start_date": datetime.now().replace(hour=0, minute=0, second=0, microsecond=0), "end_date": "Currently Running", 
+        new_data = {"start_date": datetime.now(tz=ManilaTZ()).replace(hour=0, minute=0, second=0, microsecond=0), "end_date": "Currently Running", 
                                                                                                      "isc": 50, 
                                                                                                      "fsc": 0, 
                                                                                                      "metrics": {"EC": 0, 
@@ -233,7 +244,7 @@ if st.session_state.authentication_success == True:
         latest_metric_data = list(metric_data.find().sort([('_id', -1)]).limit(1))[0]
         latest_report_data = list(report_data.find().sort([('_id', -1)]).limit(1))[0]
         latest_cycle = list(cycles.find().sort([('_id', -1)]).limit(1))[0]
-        cycles.update_one({"_id": latest_cycle["_id"]}, {"$set": {"end_date": datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+        cycles.update_one({"_id": latest_cycle["_id"]}, {"$set": {"end_date": datetime.now(tz=ManilaTZ()).replace(hour=0, minute=0, second=0, microsecond=0),
                                                                 "fsc": latest_report_data["shrimps_counted"],
                                                                 "metrics": {"EC": latest_metric_data["EC"],
                                                                             "temperature": latest_metric_data["temperature"],
